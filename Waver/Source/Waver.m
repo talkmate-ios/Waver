@@ -23,6 +23,10 @@
 
 @implementation Waver
 
+- (void)dealloc
+{
+    [_displayLink invalidate];
+}
 
 - (id)init
 {
@@ -44,6 +48,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self setup];
 }
 
@@ -72,10 +77,7 @@
 
 - (void)setWaverLevelCallback:(void (^)(Waver * waver))waverLevelCallback {
     _waverLevelCallback = waverLevelCallback;
-
-    [self.displayLink invalidate];
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(invokeWaveCallback)];
-    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+    [self startTimer];
     
     for(int i=0; i < self.numberOfWaves; i++)
     {
@@ -152,7 +154,14 @@
     UIGraphicsEndImageContext();
 }
 
-- (void)dealloc
+- (void)startTimer
+{
+    [self.displayLink invalidate];
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(invokeWaveCallback)];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+}
+
+- (void)stopTimer
 {
     [_displayLink invalidate];
 }
